@@ -47,8 +47,8 @@ function renderBoard(board) {
         strHTML += '<tr>\n'
         for (var j = 0; j < board[0].length; j++) {
             var cell = board[i][j]
-            var className = `cell data-${i} data-${j}"`
-            strHTML += `<td class="${className}> ${cell} </td>\n`
+            var className = `cell cell-${i}-${j}`
+            strHTML += `<td class="${className}"> ${cell} </td>\n`
         }
         strHTML += '</tr>\n'
     }

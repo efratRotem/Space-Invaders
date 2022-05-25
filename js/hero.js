@@ -30,9 +30,12 @@ function onKeyDown(ev) {
         case 'ArrowRight':
             dir = 1
             break;
+        default:
+            dir = 0
+            break
     }
-    console.log('dir:',dir)
     moveHero(dir)
+    console.log(' gHero.pos.j :', gHero.pos.j)
 }
 
 // Move the hero right (1) or left (-1) 
@@ -41,8 +44,19 @@ function moveHero(dir) {
         i: gHero.pos.i,
         j: gHero.pos.j + dir
     }
-    console.log('nextPos:',nextPos)
-    return nextPos
+
+    if (nextPos.j < 0 || nextPos.j > gBoard[0].length - 1) return
+
+    //DOM - leaving cell
+    var elCell = getElCell(gHero.pos)
+    elCell.innerText = ''
+    
+    //Model - next cell
+    gHero.pos.j = nextPos.j
+    
+    //DOM - next cell
+    var elCell = getElCell(gHero.pos)
+    elCell.innerText = HERO
 }
 
 // Sets an interval for shutting (blinking) the laser up towards aliens 
