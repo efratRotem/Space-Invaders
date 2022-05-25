@@ -17,7 +17,7 @@ var gIsAlienFreeze = true
 function createAliens(board) {
     for (var i = 0; i <ALIENS_ROW_COUNT; i++) {
         for (var j = 0; j < ALIENS_ROW_LENGTH; j++) {
-            board[i][j] = ALIEN
+            board[i][j] = {type: SKY, gameObject: ALIEN}
         }
     }
 } 

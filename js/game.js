@@ -6,6 +6,8 @@ const ALIENS_ROW_COUNT = 3
 const HERO = '♆'
 const ALIEN = '👽'
 const LASER = '⤊'
+const SKY = '*'
+const EARTH = '**'
 
 // Matrix of cell objects. e.g.: {type: SKY, gameObject: ALIEN} 
 var gBoard
@@ -18,8 +20,8 @@ var gGame = {
 function init() {
     gBoard = createBoard()
     renderBoard(gBoard)
-}
 
+}
 // Create and returns the board with aliens on top, ground at bottom 
 // use the functions: createCell, createHero, createAliens 
 function createBoard() {
@@ -28,16 +30,16 @@ function createBoard() {
     for (var i = 0; i < BOARD_SIZE; i++) {
         board.push([])
         for (var j = 0; j < BOARD_SIZE; j++) {
-            board[i][j] = ''
+            board[i][j] = createCell()
         }
     }
 
     createHero(board)
     createAliens(board)
-    
 
     return board
 }
+
 
 // Render the board as a <table> to the page 
 function renderBoard(board) {
@@ -48,7 +50,8 @@ function renderBoard(board) {
         for (var j = 0; j < board[0].length; j++) {
             var cell = board[i][j]
             var className = `cell cell-${i}-${j}`
-            strHTML += `<td class="${className}"> ${cell} </td>\n`
+            cell.gameObject = (!cell.gameObject) ? '' : cell.gameObject
+            strHTML += `<td class="${className}"> ${cell.gameObject} </td>\n`
         }
         strHTML += '</tr>\n'
     }
@@ -72,3 +75,4 @@ function updateCell(pos, gameObject = null) {
     var elCell = getElCell(pos)
     elCell.innerHTML = gameObject || ''
 }
+
