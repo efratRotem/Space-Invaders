@@ -8,6 +8,7 @@ const ALIEN = '👽'
 const LASER = '⤊'
 const SKY = 'SKY'
 const EARTH = 'EARTH'
+const SUPER_LASER = '^'
 
 var gScore
 
@@ -23,15 +24,20 @@ var gGame = {
 
 // Called when game loads 
 function init() {
+
     gBoard = createBoard()
     gScore = 0
+
     gGame.aliensCount = ALIENS_ROW_COUNT * ALIENS_ROW_LENGTH
+
+
 
     gElScore = document.querySelector('h3 span')
     gElScore.innerText = gScore
 
-
     renderBoard(gBoard)
+
+    if (!gGame.isOn) return
     moveAliens()
 
 
@@ -117,6 +123,12 @@ function restartGame() {
     var elModal = document.querySelector('.modal')
     elModal.style.display = 'none'
 
-    init()
+    clearInterval(gIntervalAliensRight)
+    clearInterval(gIntervalAliensLeft)
+    clearInterval(gIntervalAliensRow)
 
+    gGame.isOn = true
+
+    init()
 }
+

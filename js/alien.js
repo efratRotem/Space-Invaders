@@ -3,6 +3,9 @@
 const ALIEN_SPEED = 500
 
 var gIntervalAliens
+var gIntervalAliensRight
+var gIntervalAliensLeft
+var gIntervalAliensRow
 
 // The following two variables represent the part of the matrix (some rows) 
 // that we should shift (left, right, and bottom) // 
@@ -12,10 +15,9 @@ var gIntervalAliens
 var gAliensTopRowIdx = 0
 var gAliensBottomRowIdx = ALIENS_ROW_COUNT - 1
 
-var gIsAlienFreeze = true
+var gIsAlienFreeze = false
 
 var gCanShiftRight = true
-var gCanShiftLeft = false
 var gCanShiftDown = false
 
 function createAliens(board) {
@@ -39,32 +41,33 @@ function shiftBoardRight(board, fromI, toI) {
         for (var j = 0; j < board[0].length; j++) {
             // stop moving right - when an alien in the last board column
             if (board[i][board[0].length - 1].gameObject === ALIEN) {
-                gCanShiftRight = false
-                gCanShiftDown = true
+                // gCanShiftRight = false
+                gCanShiftDown = (gCanShiftDown) ? false : true
                 return
             }
             // cells in first column should be with gameObject = null
-            board[i][j] = (j - 1 < 0) ? createCell() : oldBoard[i][j - 1]
+            board[i][j] = (j === 0) ? createCell() : oldBoard[i][j - 1]
         }
     }
     renderBoard(board)
 }
 
 function shiftBoardLeft(board, fromI, toI) {
-    if (!gCanShiftLeft) return
+    if (gCanShiftRight) return
+    // gCanShiftDown = false
 
     var oldBoard = copyBoard(board)
 
-    for (var i = fromI; i <= toI; i++) {
+    for (var i = fromI; i <= toI + 1; i++) {
         for (var j = board[0].length - 1; j >= 0; j--) {
             // // stop moving left - when an alien in the first board column
             if (board[i][0].gameObject === ALIEN) {
-                gCanShiftLeft = false
-                gCanShiftDown = true
+                // gCanShiftRight = true
+                gCanShiftDown = (gCanShiftDown) ? false : true
                 return
             }
             // cells in last column should be with gameObject = null
-            board[i][j] = (j + 1 > board[0].length - 1) ? createCell() : oldBoard[i][j + 1]
+            board[i][j] = (j === board[0].length - 1) ? createCell() : oldBoard[i][j + 1]
         }
     }
     renderBoard(board)
@@ -73,36 +76,45 @@ function shiftBoardLeft(board, fromI, toI) {
 function shiftBoardDown(board, fromI, toI) {
     if (!gCanShiftDown) return
 
-    var oldBoard = copyBoard(board)
+    var newBoard = copyBoard(board)
 
-    for (var i = fromI; i < toI + 2; i++) {
-
-        for (var j = 0; j < oldBoard[0].length; j++) {
-            // if (board[i][j].gameObject === HERO) continue
-            console.log('i,j:', i, j)
-            board[i][j] = (i - 1 < 0) ? createCell() : oldBoard[i - 1][j]
+    for (var i = fromI; i <= toI + 1; i++) {
+        for (var j = 0; j < board[0].length; j++) {
+            newBoard[i][j] = (i === 0) ? createCell() : board[i - 1][j]
         }
-
     }
-    console.log('gAliensTopRowIdx:', gAliensTopRowIdx)
-    console.log('gAliensBottomRowIdx:', gAliensBottomRowIdx)
+
+
+
+    // var oldBoard = copyBoard(board)
+    // console.log('oldBoard:', oldBoard)
+
+    // for (var i = fromI; i <= toI + 1; i++) {
+
+    //     for (var j = 0; j <= oldBoard[0].length - 1; j++) {
+    //         // if (board[i][j].gameObject === HERO) continue
+    //         board[i][j] = (i === 0) ? createCell() : oldBoard[i - 1][j]
+    //     }
+    // }
     gAliensTopRowIdx++
     gAliensBottomRowIdx++
-    console.log('gAliensTopRowIdx:', gAliensTopRowIdx)
-    console.log('gAliensBottomRowIdx:', gAliensBottomRowIdx)
-    renderBoard(board)
 
+    renderBoard(newBoard)
+
+    gCanShiftRight = (gCanShiftRight) ? false : true
+    // gCanShiftLeft =  (gCanShiftLeft) ? false : true
     gCanShiftDown = false
-    if (!gCanShiftRight) gCanShiftLeft = true
-    if (!gCanShiftLeft) gCanShiftRight = true
+
+
 }
 
 // runs the interval for moving aliens side to side and down
 // it re-renders the board every time // 
 // when the aliens are reaching the hero row - interval stops 
 function moveAliens() {
-    // if (gIsAlienFreeze) return
-    setInterval(shiftBoardRight, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
-    setInterval(shiftBoardLeft, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
-    setInterval(shiftBoardDown, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
+    if (gIsAlienFreeze) return
+
+    gIntervalAliensRight = setInterval(shiftBoardRight, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
+    gIntervalAliensLeft = setInterval(shiftBoardLeft, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
+    gIntervalAliensRow = setInterval(shiftBoardDown, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
 }

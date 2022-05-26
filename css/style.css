@@ -1,3 +1,8 @@
+/* *{
+    box-sizing: border-box;
+}
+ */
+
 body {
     background-color: #000;
     color: azure;
@@ -31,4 +36,10 @@ table {
 .ground {
     background-color:darkgreen;
     border-collapse: collapse;
+}
+
+button {
+    margin: 10px 0px 10px 0px;
+    border-radius: 5px;
+    padding: 3px 5px 3px 5px;
 }
