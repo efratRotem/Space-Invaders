@@ -6,8 +6,13 @@ const ALIENS_ROW_COUNT = 3
 const HERO = '♆'
 const ALIEN = '👽'
 const LASER = '⤊'
-const SKY = '*'
-const EARTH = '**'
+const SKY = 'SKY'
+const EARTH = 'EARTH'
+
+var gScore
+
+var gElScore
+
 
 // Matrix of cell objects. e.g.: {type: SKY, gameObject: ALIEN} 
 var gBoard
@@ -19,7 +24,16 @@ var gGame = {
 // Called when game loads 
 function init() {
     gBoard = createBoard()
+    gScore = 0
+    gGame.aliensCount = ALIENS_ROW_COUNT * ALIENS_ROW_LENGTH
+
+    gElScore = document.querySelector('h3 span')
+    gElScore.innerText = gScore
+
+
     renderBoard(gBoard)
+    moveAliens()
+
 
 }
 // Create and returns the board with aliens on top, ground at bottom 
@@ -31,6 +45,7 @@ function createBoard() {
         board.push([])
         for (var j = 0; j < BOARD_SIZE; j++) {
             board[i][j] = createCell()
+            if (i >= BOARD_SIZE - 2) board[i][j].type = EARTH
         }
     }
 
@@ -50,6 +65,7 @@ function renderBoard(board) {
         for (var j = 0; j < board[0].length; j++) {
             var cell = board[i][j]
             var className = `cell cell-${i}-${j}`
+            if (i === board.length - 1) className += ' ground'
             cell.gameObject = (!cell.gameObject) ? '' : cell.gameObject
             strHTML += `<td class="${className}"> ${cell.gameObject} </td>\n`
         }
@@ -76,3 +92,31 @@ function updateCell(pos, gameObject = null) {
     elCell.innerHTML = gameObject || ''
 }
 
+function updateScore(diff) {
+    gScore += diff
+
+    gElScore.innerText = gScore
+}
+
+function isVictory() {
+    return (gGame.aliensCount === 0)
+}
+
+function gameOver(isVictory) {
+
+    var elModalHeader = document.querySelector('.modal h1')
+    if (isVictory) elModalHeader.innerText = 'You Won!'
+    else elModalHeader.innerText = 'You Lost!'
+
+    var elModal = document.querySelector('.modal')
+    elModal.style.display = 'block'
+
+}
+
+function restartGame() {
+    var elModal = document.querySelector('.modal')
+    elModal.style.display = 'none'
+
+    init()
+
+}

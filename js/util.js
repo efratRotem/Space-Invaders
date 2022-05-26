@@ -17,13 +17,24 @@ function renderCell(pos, value) {
     elCell.innerText = value
 }
 
-function copyMat(mat) {
-    var newMat = [];
-    for (var i = 0; i < mat.length; i++) {
-        newMat[i] = [];
-        for (var j = 0; j < mat[0].length; j++) {
-            newMat[i][j] = mat[i][j];
+function copyBoard(board) {
+    var newBoard = []
+    for (var i = 0; i < board.length; i++) {
+        newBoard[i] = []
+        for (var j = 0; j < board[0].length; j++) {
+            newBoard[i][j] = board[i][j]
         }
     }
-    return newMat;
+    return newBoard
+}
+
+function copyPartBoard(board, fromI, toI) {
+    var newBoard = []
+    for (var i = fromI; i <= toI; i++) {
+        newBoard[i] = []
+        for (var j = 0; j < board[0].length; j++) {
+            newBoard[i][j] = board[i][j]
+        }
+    }
+    return newBoard
 }

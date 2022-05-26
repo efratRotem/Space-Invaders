@@ -42,6 +42,7 @@ function onKeyDown(ev) {
 
 // Move the hero right (1) or left (-1) 
 function moveHero(dir) {
+
     var nextPos = {
         i: gHero.pos.i,
         j: gHero.pos.j + dir
@@ -51,53 +52,51 @@ function moveHero(dir) {
     if (nextPos.j < 0 || nextPos.j > gBoard[0].length - 1) return
 
     //Update DOM - leaving cell
-    renderCell(gHero.pos, '')
+    updateCell(gHero.pos)
 
     //Update Model - next cell
     gHero.pos.j = nextPos.j
 
     //Update DOM - next cell
-    renderCell(gHero.pos, HERO)
+    updateCell(gHero.pos, HERO)
 }
 
 // Sets an interval for shutting (blinking) the laser up towards aliens 
 function shoot() {
-    console.log('in shoot:')
-    // // var shootInterval = setInterval(blinkLaser, LASER_SPEED, gHero.pos)
-    // for (var i = gHero.pos - 1; i >= 0; i--) {
-    //     console.log('in loop:' )
-    //     var cell = gBoard[i][gHero.pos.j]
-    //     if (cell.gameObject === ALIEN) {
-    //         cell.gameObject = null
+    // only one shoot on board
+    if (gHero.isShoot) return
 
-    //         return
-    //     }
-    // }
+    gHero.isShoot = true
 
-    for (var i = gHero.pos.i - 1; i >=0; i--) {
-        blinkLaser({ i: i, j: gHero.pos.j })
-        
+    var laserPos = {
+        i: gHero.pos.i - 1,
+        j: gHero.pos.j
     }
 
+    var blinkInterval = setInterval(() => {
+        if (laserPos.i === 0) return
+        blinkLaser(laserPos)
+        laserPos.i--
+        if (gBoard[laserPos.i][laserPos.j].gameObject === ALIEN) {
+            updateScore(10)
+            gGame.aliensCount--
+        }
+        if (gBoard[laserPos.i][laserPos.j].gameObject === ALIEN || laserPos.i === 0) {
+            clearInterval(blinkInterval)
+            updateCell(laserPos, '')
+            gHero.isShoot = false
+            if (isVictory()) gameOver(true)
+        }
+    }, LASER_SPEED)
 
 }
 
 // renders a LASER at specific cell for short time and removes it 
 function blinkLaser(pos) {
 
-    // for (var i = pos.i - 1; i >= 0; i--) {
-    //     var cell = gBoard[i][pos.j]
-    //     if (cell.gameObject === ALIEN) {
-    //         cell.gameObject = null
-    //         updateCell({ i: i, j: pos.j }, '')
-    //         return
-    //     }
-
+    gBoard[pos.i][pos.j].gameObject = LASER
     updateCell({ i: pos.i, j: pos.j }, LASER)
 
-    setTimeout(updateCell, 1, { i: pos.i, j: pos.j }, '')
-    // setTimeout(updateCell, 0, { i: i, j: pos.j }, LASER)
-    // setTimeout(updateCell, 0.5, { i: i, j: pos.j }, '')
-    // }
-
+    gBoard[pos.i][pos.j].gameObject = null
+    setTimeout(updateCell, LASER_SPEED, { i: pos.i, j: pos.j }, '')
 }
