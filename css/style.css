@@ -1,10 +1,6 @@
-/* *{
-    box-sizing: border-box;
-}
- */
-
 body {
-    background-color: #000;
+    /* background-color: #000; */
+    background: linear-gradient(162deg, rgba(22,29,31,1) 32%, rgba(48,45,253,1) 76%, rgba(217,233,236,1) 88%);
     color: azure;
     text-align: center;
     font-family: 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS', sans-serif;
@@ -18,12 +14,13 @@ body {
 table {
     margin: auto;
     border: 1px solid #79db75;
+    box-shadow: 1px 0px 22px 17px rgba(121,219,117,0.94);
 }
 
 .modal {
-    background-color: rgb(208, 34, 34);
-    height: 100px;
-    width: 400px;
+    box-shadow: 4px -4px 15px 0px #FF1F1F, 12px -11px 7px 0px #FF9376, 20px -5px 7px 0px #FFE264, 20px 6px 7px 0px #F6FF33, 13px 12px 17px 0px #FF9527, 2px 17px 17px 0px #FF0000, -9px 21px 18px 0px #FFF212, -9px 6px 11px 0px #FF0808, -11px -9px 11px 0px #FFFA17, -11px -9px 11px 0px #FFFA17, 1px 0px 22px 17px #32DB2D;
+    height: 160px;
+    width: 300px;
     margin: auto;
     display: none;
     padding: 1%;
@@ -31,6 +28,7 @@ table {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    border-radius: 5px;
 }
 
 .ground {
@@ -42,4 +40,12 @@ button {
     margin: 10px 0px 10px 0px;
     border-radius: 5px;
     padding: 3px 5px 3px 5px;
+    background: linear-gradient(162deg, rgba(22,29,31,1) 32%, rgba(48,45,253,1) 76%, rgba(217,233,236,1) 88%);
+    color: azure;
+    cursor: pointer;
+}
+
+button:hover{
+    background: linear-gradient(324deg, rgba(22,29,31,1) 32%, rgba(48,45,253,1) 76%, rgba(217,233,236,1) 88%);
+    
 }

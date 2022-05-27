@@ -42,8 +42,8 @@ function onKeyDown(ev) {
             dir = 0
             break
         case 'x':
-            gHero.isSuperAttack = true
-            shoot()
+            gHero.isSuperAttack = (gHero.superAttacksCount === 0) ? false : true
+            if (gHero.isSuperAttack) shoot()
             dir = 0
             break
         default:
@@ -77,23 +77,24 @@ function moveHero(dir) {
 
 // Sets an interval for shutting (blinking) the laser up towards aliens 
 function shoot() {
+    console.log('gHero:', gHero)
     if (!gGame.isOn) return
     // only one shoot on board
     if (gHero.isShoot) return
 
     gHero.isShoot = true
-    
+
     var laserPos = {
         i: gHero.pos.i - 1,
         j: gHero.pos.j
     }
+
     var laserSpeed = LASER_SPEED
-    
+
     if (gHero.isSuperAttack) {
-        gHero.isSuperAttack = false
-        if (gHero.superAttacksCount === 0) return
         laserSpeed *= 0.5
         gHero.superAttacksCount--
+        gHero.isSuperAttack = false
     }
 
     var blinkInterval = setInterval(() => {
@@ -142,7 +143,6 @@ function shootNeighbors(pos) {
             updateCell({ i, j })
         }
     }
-    console.log('countAliens:', countAliens)
     gGame.aliensCount -= countAliens
     updateScore(countAliens * 10)
 }

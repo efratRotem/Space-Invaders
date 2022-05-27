@@ -30,7 +30,8 @@ function init() {
 
     gGame.aliensCount = ALIENS_ROW_COUNT * ALIENS_ROW_LENGTH
 
-
+        // gHero.isSuperAttack = false
+        // gHero.superAttacksCount = false
 
     gElScore = document.querySelector('h3 span')
     gElScore.innerText = gScore
@@ -38,6 +39,7 @@ function init() {
     renderBoard(gBoard)
 
     if (!gGame.isOn) return
+
     moveAliens()
 
 
@@ -111,24 +113,41 @@ function isVictory() {
 function gameOver(isVictory) {
 
     var elModalHeader = document.querySelector('.modal h1')
-    if (isVictory) elModalHeader.innerText = 'You Won!'
-    else elModalHeader.innerText = 'You Lost!'
+    var elModalThirdHeader = document.querySelector('.modal h3')
+    if (isVictory) {
+        elModalHeader.innerText = 'You Won!'
+        elModalThirdHeader.innerText = '🏆'
+    }
+    else {
+        elModalHeader.innerText = 'You Lost!'
+        elModalThirdHeader.innerText = '😭😭😭'
+    }
+    gGame.isOn = false
+
+    clearInterval(gIntervalAliensRight)
+    clearInterval(gIntervalAliensLeft)
+    clearInterval(gIntervalAliensDown)
 
     var elModal = document.querySelector('.modal')
     elModal.style.display = 'block'
-
 }
 
 function restartGame() {
     var elModal = document.querySelector('.modal')
     elModal.style.display = 'none'
 
+    gGame.isOn = true
+
+    gAliensTopRowIdx = 0
+    gAliensBottomRowIdx = ALIENS_ROW_COUNT - 1
+    gIsAlienFreeze = false
+    gCanShiftRight = true
+    gCanShiftLeft = false
+    gCanShiftDown = false
+
     clearInterval(gIntervalAliensRight)
     clearInterval(gIntervalAliensLeft)
-    clearInterval(gIntervalAliensRow)
-
-    gGame.isOn = true
+    clearInterval(gIntervalAliensDown)
 
     init()
 }
-
