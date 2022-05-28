@@ -38,3 +38,30 @@ function copyPartBoard(board, fromI, toI) {
     }
     return newBoard
 }
+
+//Find empty cell, only in the first row
+function getEmptyCell(board) {
+
+    var emptyCells = []
+
+    for (var i = 0; i < 1; i++) {
+        for (var j = 0; j < board[i].length; j++) {
+            var cell = board[i][j]
+
+            if (!cell.gameObject) emptyCells.push({ cell, i, j })
+        }
+    }
+    // console.log('emptyCells:', emptyCells)
+
+    var idx = getRandomIntInclusive(0, emptyCells.length - 1)
+    cell = emptyCells[idx]
+    // console.log('cell:', cell)
+    return cell
+}
+
+
+function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+}

@@ -1,6 +1,6 @@
 'use strict'
 
-const ALIEN_SPEED = 500
+var ALIEN_SPEED = 500
 
 var gIntervalAliens
 var gIntervalAliensRight
@@ -22,67 +22,84 @@ var gCanShiftLeft = false
 var gCanShiftDown = false
 
 function createAliens(board) {
-    for (var i = 0; i < ALIENS_ROW_COUNT; i++) {
-        for (var j = 0; j < ALIENS_ROW_LENGTH; j++) {
+    for (var i = 0; i < gAliensRowCount; i++) {
+        for (var j = 0; j < gAliensRowLength; j++) {
             board[i][j] = { type: SKY, gameObject: ALIEN }
         }
     }
     gAliensTopRowIdx = 0
-    gAliensBottomRowIdx = ALIENS_ROW_COUNT - 1
+    gAliensBottomRowIdx = gAliensRowCount - 1
 }
 
 function handleAlienHit(pos) {
-    if (gBoard[pos.i][pos.j].gameObject === ALIEN && gBoard[pos.i][pos.j].type === EARTH) alert('You Lost')
+    // If an ALIEN hit a LASER
+    if (gBoard[pos.i][pos.j].gameObject === LASER) {
+        updateCell(pos, '')
+        gGame.aliensCount--
+    }
+
 
 }
 
-function shiftBoardRight(board, fromI = gAliensTopRowIdx, toI = gAliensBottomRowIdx) {
+function shiftBoardRight(board, fromI, toI) {
     if (!gCanShiftRight) return
     if (gCanShiftDown) return
 
     var oldBoard = copyBoard(board)
 
     for (var i = fromI; i <= toI; i++) {
-        for (var j = 0; j < board[0].length; j++) {
-            // stop moving right - when an alien in the last board column
+        for (var j = 0; j <= board[0].length - 1; j++) {
+            // Cells in first column should be with gameObject = null
+            board[i][j] = (j === 0) ? createCell() : oldBoard[i][j - 1]
+
+            // If an ALIEN hit a LASER
+            handleAlienHit({ i, j })
+
+            // Cells in first row, that are Candy, should stay Candy and not be shifted
+            if (oldBoard[i][j].gameObject === CANDY) board[i][j] = oldBoard[i][j]
+
+            // Stop moving right - when an alien in the last board column
             if (board[i][board[0].length - 1].gameObject === ALIEN) {
-                gCanShiftRight = false
-                gCanShiftDown = true
-                gCanShiftLeft = true
                 clearInterval(gIntervalAliensRight)
-                return
+                gCanShiftRight = false
+                gCanShiftLeft = true
+                gCanShiftDown = true
             }
-            // cells in first column should be with gameObject = null
-            board[i][j] = (j - 1 < 0) ? createCell() : oldBoard[i][j - 1]
+            updateCell({i,j},board[i][j].gameObject)
         }
     }
-    renderBoard(board)
-    // moveAliens()
+    // renderBoard(board)
 }
 
-function shiftBoardLeft(board, fromI = gAliensTopRowIdx, toI = gAliensBottomRowIdx) {
+function shiftBoardLeft(board, fromI, toI) {
     if (!gCanShiftLeft) return
     if (gCanShiftDown) return
     var oldBoard = copyBoard(board)
 
     for (var i = fromI; i <= toI; i++) {
-        for (var j = board[0].length - 1; j >= -1; j--) {
+        for (var j = board[0].length - 1; j >= 0; j--) {
 
+            // Cells in last column should be with gameObject = null
             board[i][j] = (j === board[0].length - 1) ? createCell() : oldBoard[i][j + 1]
-            // // stop moving left - when an alien in the first board column
-            var cell = board[i][0]
-            if (cell.gameObject === ALIEN) {
+
+            // If an ALIEN hit a LASER
+            handleAlienHit({ i, j })
+
+            // Cells in first row, that are Candy, should stay Candy and not be shifted
+            if (oldBoard[i][j].gameObject === CANDY) board[i][j] = oldBoard[i][j]
+
+
+            // Stop moving left - when an alien in the first board column
+            if (board[i][0].gameObject === ALIEN) {
                 gCanShiftLeft = false
                 gCanShiftRight = true
                 gCanShiftDown = true
                 clearInterval(gIntervalAliensLeft)
-                return
             }
-            // cells in last column should be with gameObject = null
+            updateCell({i,j},board[i][j].gameObject)
         }
     }
-    renderBoard(board)
-    // moveAliens()
+    // renderBoard(board)
 }
 
 function shiftBoardDown(board, fromI, toI) {
@@ -91,14 +108,19 @@ function shiftBoardDown(board, fromI, toI) {
     var oldBoard = copyBoard(board)
 
     for (var i = fromI; i < toI + 2; i++) {
-
         for (var j = 0; j < oldBoard[0].length; j++) {
-            // if (board[i][j].gameObject === HERO) continue
-            board[i][j] = (i - 1 < 0) ? createCell() : oldBoard[i - 1][j]
+            if (oldBoard[i][j].gameObject === CANDY) {
+                board[i][j] = oldBoard[i][j]
+            } else {
+                board[i][j] = (i - 1 < 0) ? createCell() : oldBoard[i - 1][j]
+            }
+
+            updateCell({i,j},board[i][j].gameObject)
+            // If an ALIEN hit a LASER
+            handleAlienHit({ i, j })
         }
     }
-
-    renderBoard(board)
+    // renderBoard(board)
 
     if (isLost()) gameOver(false)
 
@@ -118,8 +140,8 @@ function moveAliens() {
     if (gIsAlienFreeze) return
     if (!gGame.isOn) return
 
-    gIntervalAliensRight = setInterval(shiftBoardRight, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
     gIntervalAliensDown = setInterval(shiftBoardDown, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
+    gIntervalAliensRight = setInterval(shiftBoardRight, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
     gIntervalAliensLeft = setInterval(shiftBoardLeft, ALIEN_SPEED, gBoard, gAliensTopRowIdx, gAliensBottomRowIdx)
 }
 
@@ -129,7 +151,6 @@ function updateAlienRowIdx() {
 }
 
 function isLost() {
-
     for (var i = gBoard.length - 2; i < gBoard.length - 1; i++) {
         for (var j = 0; j < gBoard[0].length; j++) {
             if (gBoard[i][j].gameObject === ALIEN) {
@@ -144,8 +165,16 @@ function isLost() {
 }
 
 function freezeAliens() {
-    gIsAlienFreeze = true
-    clearInterval(gIntervalAliensDown)
-    clearInterval(gIntervalAliensLeft)
-    clearInterval(gIntervalAliensRight)
+    var elBtnFreezeAliens = document.querySelector('.freezing-aliens')
+    if (!gIsAlienFreeze) {
+        gIsAlienFreeze = true
+        clearInterval(gIntervalAliensDown)
+        clearInterval(gIntervalAliensLeft)
+        clearInterval(gIntervalAliensRight)
+        elBtnFreezeAliens.innerText = 'UnFreezing Aliens'
+    } else {
+        gIsAlienFreeze = false
+        moveAliens()
+        elBtnFreezeAliens.innerText = 'Freezing Aliens'
+    }
 }

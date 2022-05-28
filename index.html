@@ -15,7 +15,15 @@
 
     <h3>Score: <span></span></h3>
 
+    <div class="level">
+        <h4>Choose your level</h2>
+            <button onclick="setLevel(8,3,1000)">Easy</button>
+            <button onclick="setLevel(10,4,500)">Normal</button>
+            <button onclick="setLevel(12,5,250)">Hard</button>
+    </div>
+
     <button onclick="restartGame()">Start Game</button>
+
 
     <div class="modal">
         <h1></h1>
@@ -25,8 +33,8 @@
 
     <div class="board-container"></div>
 
-    <button onclick="freezeAliens()">Freeze Aliens</button>
-    
+    <button class="freezing-aliens" onclick="freezeAliens()">Freeze Aliens</button>
+
     <h6>Efrat Rotem</h1>
 
 

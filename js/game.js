@@ -1,26 +1,28 @@
 'use strict'
 
 const BOARD_SIZE = 14
-const ALIENS_ROW_LENGTH = 8
-const ALIENS_ROW_COUNT = 3
 const HERO = '♆'
 const ALIEN = '👽'
 const LASER = '⤊'
 const SKY = 'SKY'
 const EARTH = 'EARTH'
 const SUPER_LASER = '^'
+const CANDY = '🧁'
 
-var gScore
-
-var gElScore
-
-
+var gAliensRowLength = 8
+var gAliensRowCount = 3
 // Matrix of cell objects. e.g.: {type: SKY, gameObject: ALIEN} 
 var gBoard
 var gGame = {
     isOn: false,
     aliensCount: 0
 }
+var gScore
+
+var gIntervalCandy
+var gIntervalRemoveCandy
+
+var gElScore
 
 // Called when game loads 
 function init() {
@@ -28,10 +30,7 @@ function init() {
     gBoard = createBoard()
     gScore = 0
 
-    gGame.aliensCount = ALIENS_ROW_COUNT * ALIENS_ROW_LENGTH
-
-        // gHero.isSuperAttack = false
-        // gHero.superAttacksCount = false
+    gGame.aliensCount = gAliensRowCount * gAliensRowLength
 
     gElScore = document.querySelector('h3 span')
     gElScore.innerText = gScore
@@ -40,9 +39,8 @@ function init() {
 
     if (!gGame.isOn) return
 
+    gIntervalCandy = setInterval(addCandy, 10000)
     moveAliens()
-
-
 }
 // Create and returns the board with aliens on top, ground at bottom 
 // use the functions: createCell, createHero, createAliens 
@@ -56,7 +54,6 @@ function createBoard() {
             if (i >= BOARD_SIZE - 2) board[i][j].type = EARTH
         }
     }
-
     createHero(board)
     createAliens(board)
 
@@ -66,8 +63,8 @@ function createBoard() {
 
 // Render the board as a <table> to the page 
 function renderBoard(board) {
-
     var strHTML = '<table border="0"><tbody>'
+
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>\n'
         for (var j = 0; j < board[0].length; j++) {
@@ -102,7 +99,6 @@ function updateCell(pos, gameObject = null) {
 
 function updateScore(diff) {
     gScore += diff
-
     gElScore.innerText = gScore
 }
 
@@ -111,14 +107,13 @@ function isVictory() {
 }
 
 function gameOver(isVictory) {
-
     var elModalHeader = document.querySelector('.modal h1')
     var elModalThirdHeader = document.querySelector('.modal h3')
+
     if (isVictory) {
         elModalHeader.innerText = 'You Won!'
         elModalThirdHeader.innerText = '🏆'
-    }
-    else {
+    } else {
         elModalHeader.innerText = 'You Lost!'
         elModalThirdHeader.innerText = '😭😭😭'
     }
@@ -127,6 +122,8 @@ function gameOver(isVictory) {
     clearInterval(gIntervalAliensRight)
     clearInterval(gIntervalAliensLeft)
     clearInterval(gIntervalAliensDown)
+    clearInterval(gIntervalCandy)
+    clearInterval(gIntervalRemoveCandy)
 
     var elModal = document.querySelector('.modal')
     elModal.style.display = 'block'
@@ -137,9 +134,10 @@ function restartGame() {
     elModal.style.display = 'none'
 
     gGame.isOn = true
+    updateHero()
 
     gAliensTopRowIdx = 0
-    gAliensBottomRowIdx = ALIENS_ROW_COUNT - 1
+    gAliensBottomRowIdx = gAliensRowCount - 1
     gIsAlienFreeze = false
     gCanShiftRight = true
     gCanShiftLeft = false
@@ -148,6 +146,26 @@ function restartGame() {
     clearInterval(gIntervalAliensRight)
     clearInterval(gIntervalAliensLeft)
     clearInterval(gIntervalAliensDown)
+    clearInterval(gIntervalCandy)
+    clearInterval(gIntervalRemoveCandy)
 
     init()
+}
+
+function addCandy() {
+    var cell = getEmptyCell(gBoard)
+    updateCell({ i: cell.i, j: cell.j }, CANDY)
+    gIntervalRemoveCandy = setTimeout(removeCandy, 5000, cell.i, cell.j)
+}
+
+function removeCandy(i, j) {
+    updateCell({ i, j }, '')
+}
+
+function setLevel(rowLength = gAliensRowLength, rowCount = gAliensRowCount, speed = 500) {
+    gAliensRowLength = rowLength
+    gAliensRowCount = rowCount
+    ALIEN_SPEED = speed
+
+    restartGame()
 }

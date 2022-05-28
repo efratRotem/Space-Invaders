@@ -12,7 +12,6 @@ var gHero = {
 
 // creates the hero and place it on board 
 function createHero(board) {
-
     for (var i = 0; i < board.length; i++) {
         for (var j = 0; j < board[0].length; j++) {
             if (i === gHero.pos.i && j === gHero.pos.j) board[i][j] = { type: EARTH, gameObject: HERO }
@@ -22,7 +21,6 @@ function createHero(board) {
 
 // Handle game keys 
 function onKeyDown(ev) {
-
     var dir
 
     switch (ev.key) {
@@ -34,22 +32,21 @@ function onKeyDown(ev) {
             break
         case ' ':
             shoot()
-            dir = 0
             break
         case 'n':
             gHero.isShootNeighbors = true
             shoot()
-            dir = 0
             break
         case 'x':
             gHero.isSuperAttack = (gHero.superAttacksCount === 0) ? false : true
             if (gHero.isSuperAttack) shoot()
-            dir = 0
             break
         default:
-            dir = 0
             break
     }
+
+    dir = (dir === -1) ? -1 : (dir === 1) ? 1 : 0
+
     moveHero(dir)
 }
 
@@ -62,22 +59,21 @@ function moveHero(dir) {
         j: gHero.pos.j + dir
     }
 
-    // console.log('gBoard:', gBoard)
     if (nextPos.j < 0 || nextPos.j > gBoard[0].length - 1) return
 
-    //Update DOM - leaving cell
+    //Update Model & DOM - leaving cell
     updateCell(gHero.pos)
 
-    //Update Model - next cell
+    //Update HERO position - next cell
     gHero.pos.j = nextPos.j
 
-    //Update DOM - next cell
+    //Update Model & DOM - next cell
     updateCell(gHero.pos, HERO)
 }
 
 // Sets an interval for shutting (blinking) the laser up towards aliens 
 function shoot() {
-    console.log('gHero:', gHero)
+
     if (!gGame.isOn) return
     // only one shoot on board
     if (gHero.isShoot) return
@@ -108,8 +104,12 @@ function shoot() {
                 shootNeighbors(laserPos)
                 gHero.isShootNeighbors = false
             }
+        } else if (gBoard[laserPos.i][laserPos.j].gameObject === CANDY) {
+            updateScore(50)
         }
-        if (gBoard[laserPos.i][laserPos.j].gameObject === ALIEN || laserPos.i === 0) {
+        if (gBoard[laserPos.i][laserPos.j].gameObject === ALIEN ||
+            gBoard[laserPos.i][laserPos.j].gameObject === CANDY ||
+            laserPos.i === 0) {
             clearInterval(blinkInterval)
             updateCell(laserPos, '')
             gHero.isShoot = false
@@ -125,11 +125,11 @@ function blinkLaser(pos) {
     var laser
     laser = (gHero.isSuperAttack) ? SUPER_LASER : LASER
 
-    gBoard[pos.i][pos.j].gameObject = LASER
+    gBoard[pos.i][pos.j].gameObject = laser
     updateCell({ i: pos.i, j: pos.j }, laser)
 
-    gBoard[pos.i][pos.j].gameObject = null
-    setTimeout(updateCell, LASER_SPEED, { i: pos.i, j: pos.j }, '')
+    gBoard[pos.i][pos.j].gameObject = ''
+    setTimeout(updateCell, LASER_SPEED, { i: pos.i, j: pos.j })
 }
 
 function shootNeighbors(pos) {
@@ -144,6 +144,11 @@ function shootNeighbors(pos) {
         }
     }
     gGame.aliensCount -= countAliens
-    updateScore(countAliens * 10)
+    console.log('countAliens:', countAliens)
+    // score for the alien in cell {i:j} and his neighbors
+    updateScore((countAliens) * 10)
 }
 
+function updateHero() {
+    gHero.superAttacksCount = 3
+}
