@@ -39,7 +39,7 @@ function init() {
 
     if (!gGame.isOn) return
 
-    gIntervalCandy = setInterval(addCandy, 10000)
+    // gIntervalCandy = setInterval(addCandy, 10000)
     moveAliens()
 }
 // Create and returns the board with aliens on top, ground at bottom 
@@ -162,7 +162,7 @@ function removeCandy(i, j) {
     updateCell({ i, j }, '')
 }
 
-function setLevel(rowLength = gAliensRowLength, rowCount = gAliensRowCount, speed = 500) {
+function setLevel(rowLength = 8, rowCount = 3, speed = 500) {
     gAliensRowLength = rowLength
     gAliensRowCount = rowCount
     ALIEN_SPEED = speed

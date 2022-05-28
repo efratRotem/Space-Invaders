@@ -36,9 +36,9 @@ function handleAlienHit(pos) {
     if (gBoard[pos.i][pos.j].gameObject === LASER) {
         updateCell(pos, '')
         gGame.aliensCount--
+        console.log(' gGame.aliensCount--:', gGame.aliensCount--)
+        clearInterval(gBlinkInterval)
     }
-
-
 }
 
 function shiftBoardRight(board, fromI, toI) {
@@ -65,10 +65,9 @@ function shiftBoardRight(board, fromI, toI) {
                 gCanShiftLeft = true
                 gCanShiftDown = true
             }
-            updateCell({i,j},board[i][j].gameObject)
         }
     }
-    // renderBoard(board)
+    renderBoard(board)
 }
 
 function shiftBoardLeft(board, fromI, toI) {
@@ -96,10 +95,9 @@ function shiftBoardLeft(board, fromI, toI) {
                 gCanShiftDown = true
                 clearInterval(gIntervalAliensLeft)
             }
-            updateCell({i,j},board[i][j].gameObject)
         }
     }
-    // renderBoard(board)
+    renderBoard(board)
 }
 
 function shiftBoardDown(board, fromI, toI) {
@@ -115,12 +113,11 @@ function shiftBoardDown(board, fromI, toI) {
                 board[i][j] = (i - 1 < 0) ? createCell() : oldBoard[i - 1][j]
             }
 
-            updateCell({i,j},board[i][j].gameObject)
             // If an ALIEN hit a LASER
             handleAlienHit({ i, j })
         }
     }
-    // renderBoard(board)
+    renderBoard(board)
 
     if (isLost()) gameOver(false)
 

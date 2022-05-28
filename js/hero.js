@@ -1,7 +1,10 @@
 'use strict'
 
 const LASER_SPEED = 80
+const ALIEN_POINTS = 10
+const CANDY_POINTS = 50
 
+var gBlinkInterval
 var gHero = {
     pos: { i: 12, j: 5 },
     isShoot: false,
@@ -44,7 +47,6 @@ function onKeyDown(ev) {
         default:
             break
     }
-
     dir = (dir === -1) ? -1 : (dir === 1) ? 1 : 0
 
     moveHero(dir)
@@ -93,35 +95,31 @@ function shoot() {
         gHero.isSuperAttack = false
     }
 
-    var blinkInterval = setInterval(() => {
+    gBlinkInterval = setInterval(() => {
         if (laserPos.i === 0) return
         blinkLaser(laserPos)
         laserPos.i--
         if (gBoard[laserPos.i][laserPos.j].gameObject === ALIEN) {
-            updateScore(10)
+            updateScore(ALIEN_POINTS)
             gGame.aliensCount--
             if (gHero.isShootNeighbors) {
                 shootNeighbors(laserPos)
                 gHero.isShootNeighbors = false
             }
         } else if (gBoard[laserPos.i][laserPos.j].gameObject === CANDY) {
-            updateScore(50)
+            updateScore(CANDY_POINTS)
         }
-        if (gBoard[laserPos.i][laserPos.j].gameObject === ALIEN ||
-            gBoard[laserPos.i][laserPos.j].gameObject === CANDY ||
-            laserPos.i === 0) {
-            clearInterval(blinkInterval)
+        if (gBoard[laserPos.i][laserPos.j].gameObject === ALIEN || laserPos.i === 0) {
+            clearInterval(gBlinkInterval)
             updateCell(laserPos, '')
             gHero.isShoot = false
             if (isVictory()) gameOver(true)
         }
     }, laserSpeed)
-
 }
 
 // renders a LASER at specific cell for short time and removes it 
 function blinkLaser(pos) {
-
     var laser
     laser = (gHero.isSuperAttack) ? SUPER_LASER : LASER
 
@@ -144,9 +142,8 @@ function shootNeighbors(pos) {
         }
     }
     gGame.aliensCount -= countAliens
-    console.log('countAliens:', countAliens)
-    // score for the alien in cell {i:j} and his neighbors
-    updateScore((countAliens) * 10)
+    // score for removing ALIEN neighbors 
+    updateScore((countAliens) * ALIEN_POINTS)
 }
 
 function updateHero() {
